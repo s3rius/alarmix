@@ -25,7 +25,7 @@ Then you can manage your alarms with `alarmc` command.
     alarmc # Show scheduled alarms
     alarmc stop # Stop buzzing alarm
     alarmc add 20:00 19:30 14:00 # Add alarms
-    alarmc add 20:00 --delete # delete TODO: make other command
+    alarmc delete 20:00 # Remove alarm from schedule
     alarmc
 
     alarmc -h # Show help
