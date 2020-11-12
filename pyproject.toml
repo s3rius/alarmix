@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "alarmix"
-version = "0.3.14"
+version = "0.3.16"
 description = "Alarm manager server and client"
 authors = ["Pavel Kirilin <win10@list.ru>"]
 repository = "https://github.com/s3rius/alarmix"
 homepage = "https://github.com/s3rius/alarmix"
-readme = "README.md"
+readme = "README.rst"
 
 packages = [
     { include = "alarmix" },
@@ -15,6 +15,11 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3.8",
     "Topic :: Utilities"
+]
+keywords = [
+    "Poetry",
+    "Alarm",
+    "Unix sockets"
 ]
 
 [tool.poetry.dependencies]
