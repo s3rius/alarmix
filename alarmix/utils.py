@@ -14,7 +14,7 @@ class DeltaAlarm:
     delta: timedelta
 
 
-def calculate_auto_time(event_time: time):
+def calculate_auto_time(event_time: time) -> datetime:
     now = datetime.now()
     new_delta = now.replace(hour=event_time.hour, minute=event_time.minute) - now
     target = now + timedelta(seconds=new_delta.seconds)
@@ -32,7 +32,7 @@ def add_delta_to_alarms(alarms_list: Iterable[time]) -> List[DeltaAlarm]:
     return alarms_with_delta
 
 
-def remove_if_exists(filename: str):
+def remove_if_exists(filename: str) -> None:
     """
     Removes file
     """

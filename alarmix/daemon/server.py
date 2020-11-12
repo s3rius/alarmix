@@ -11,22 +11,16 @@ from alarmix.schema import TimeMessageSocket
 from alarmix.utils import remove_if_exists
 
 
-def listen_loop(socket_path: str, manager: AlarmManager):
-    """
-    Function listens to socket_path and consumes timers.
-    """
-
-
 class ServerThread(threading.Thread):
     def __init__(self, manager: AlarmManager, args: Namespace):
         threading.Thread.__init__(self)
         self.manager = manager
         self.socket = args.socket
 
-    def finalize(self):
+    def finalize(self) -> None:
         remove_if_exists(self.socket)
 
-    def run(self):
+    def run(self) -> None:
         logger.info("Started daemon")
         remove_if_exists(self.socket)
         server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

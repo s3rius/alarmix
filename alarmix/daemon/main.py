@@ -20,7 +20,7 @@ def parse_args() -> Namespace:
     return arg_parse.parse_args()
 
 
-def run_threads(args: Namespace):
+def run_threads(args: Namespace) -> None:
     local_manager = AlarmManager(args.backup)
     local_manager.load_alarms()
     server = ServerThread(local_manager, args)

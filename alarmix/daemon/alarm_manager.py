@@ -21,25 +21,27 @@ class AlarmManager:
     def __init__(self, dump_file: str):
         self.dump_file = dump_file
         self.alarm_pid: Optional[int] = None
-        self.alarms: DefaultDict[Set[Union[time, datetime]]] = defaultdict(set)
+        self.alarms: DefaultDict[str, Set[Union[time, datetime]]] = defaultdict(set)
 
     def process_message(self, msg: TimeMessageSocket) -> str:
         """
         Update alarms by TimeMessageSocket action.
         Delete|Add|List|Stop.
         """
+        message = "Something happened"
         if msg.action == RequestAction.delete:
             self.del_alarm(msg.time, msg.when)
-            return "Successfully deleted"
+            self.dump_alarms()
+            message = "Successfully deleted"
         elif msg.action == RequestAction.add:
             self.add_alarm(msg.time, msg.when)
-            return "Successfully added"
+            self.dump_alarms()
+            message = "Successfully added"
         elif msg.action == RequestAction.list:
-            return self.list_formatted()
+            message = self.list_formatted()
         elif msg.action == RequestAction.stop:
-            return self.stop_alarm()
-
-        self.dump_alarms()
+            message = self.stop_alarm()
+        return message
 
     def list_formatted(self) -> str:
         """
@@ -61,14 +63,14 @@ class AlarmManager:
             )
         return table.get_string()
 
-    def add_alarm(self, event_time: time, when: When):
+    def add_alarm(self, event_time: time, when: When) -> None:
         logger.debug(f"Adding {event_time}")
         target = event_time
         if when == When.auto:
             target = calculate_auto_time(event_time)
         self.alarms[when.value].add(target)
 
-    def del_alarm(self, event_time: time, when: When):
+    def del_alarm(self, event_time: time, when: When) -> None:
         """
         Delete alarm from queue
         """
@@ -92,8 +94,8 @@ class AlarmManager:
             alarms.update(self.alarms[key])
 
         for alarm in self.alarms[When.auto.value]:
-            if date.today() == alarm.date():
-                alarms.add(alarm.time())
+            if date.today() == alarm.date():  # type: ignore
+                alarms.add(alarm.time())  # type: ignore
         delta_alarms = add_delta_to_alarms(alarms)
         return list(sorted(delta_alarms, key=attrgetter("delta")))
 
@@ -108,22 +110,22 @@ class AlarmManager:
             return "Alarm stopped"
         return "Alarm isn't running"
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """
         Remove all outdated auto calculated alarms.
         """
         correct_alarms = set()
         for alarm_time in self.alarms[When.auto.value]:
-            if alarm_time >= datetime.now():
+            if alarm_time >= datetime.now():  # type: ignore
                 correct_alarms.add(alarm_time)
         self.alarms[When.auto.value] = correct_alarms
 
-    def dump_alarms(self):
+    def dump_alarms(self) -> None:
         with open(self.dump_file, "wb") as file:
             pickle.dump(self.alarms, file)
 
-    def load_alarms(self):
+    def load_alarms(self) -> None:
         if not os.path.exists(self.dump_file):
-            return []
+            return None
         with open(self.dump_file, "rb") as file:
             self.alarms = pickle.load(file)

@@ -11,7 +11,7 @@ from alarmix.utils import SOCKET_NAME
 
 def send_message(
     socket_addr: str, time_str: Optional[str], when: str, action: RequestAction
-):
+) -> None:
     """
     Communicate with alarm server running on socket-file.
     """
@@ -59,7 +59,7 @@ def parse_args() -> Namespace:
     return arg_parse.parse_args()
 
 
-def main():
+def main() -> None:
     args = parse_args()
     try:
         if args.namespace is None:
