@@ -114,11 +114,11 @@ class AlarmManager:
         """
         Remove all outdated auto calculated alarms.
         """
-        correct_alarms = set()
-        for alarm_time in self.alarms[When.auto.value]:
-            if alarm_time >= datetime.now():  # type: ignore
-                correct_alarms.add(alarm_time)
-        self.alarms[When.auto.value] = correct_alarms
+        now = datetime.now()
+        auto_alarms = self.alarms[When.auto.value]
+        self.alarms[When.auto.value] = {
+            alarm for alarm in auto_alarms if alarm >= now  # type: ignore
+        }
 
     def dump_alarms(self) -> None:
         with open(self.dump_file, "wb") as file:
