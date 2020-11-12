@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "alarmix"
-version = "0.2.13"
+version = "0.3.13"
 description = "Alarm manager server and client"
 authors = ["Pavel Kirilin <win10@list.ru>"]
 packages = [
@@ -12,6 +12,9 @@ python = "^3.8"
 pydantic = "^1.7.2"
 loguru = "^0.5.3"
 prettytable = "^1.0.1"
+
+[tool.poetry.dev-dependencies]
+pre-commit = "^2.8.2"
 
 [tool.poetry.scripts]
 alarmc = 'alarmix.client.main:main'
