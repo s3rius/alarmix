@@ -13,6 +13,9 @@ pydantic = "^1.7.2"
 loguru = "^0.5.3"
 prettytable = "^1.0.1"
 
+[tool.poetry.dev-dependencies]
+pre-commit = "^2.8.2"
+
 [tool.poetry.scripts]
 alarmc = 'alarmix.client.main:main'
 alarmd = 'alarmix.daemon.main:main'
