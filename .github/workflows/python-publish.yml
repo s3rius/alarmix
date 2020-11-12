@@ -1,0 +1,30 @@
+# This workflows will upload a Python Package using Twine when a release is created
+# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+name: Upload Python Package
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'    
+    - name: Publish package
+      uses: hericlesme/PyPoetry@0.0.1
+      env:
+        POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+      with:
+        # The poetry command to run
+        command: publish --build
+        # The python version to install
+        python_version: 3.8 # optional, default is 3.8
+        # The poetry version to install
+        poetry_version: 1.1.4 # optional, default is 1.0
