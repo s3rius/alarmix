@@ -3,8 +3,18 @@ name = "alarmix"
 version = "0.3.13"
 description = "Alarm manager server and client"
 authors = ["Pavel Kirilin <win10@list.ru>"]
+repository = "https://github.com/s3rius/alarmix"
+homepage = "https://github.com/s3rius/alarmix"
+readme = "README.md"
+
 packages = [
     { include = "alarmix" },
+]
+
+classifiers = [
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Utilities"
 ]
 
 [tool.poetry.dependencies]
