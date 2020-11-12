@@ -31,7 +31,8 @@ def parse_args() -> Namespace:
     subparsers = arg_parse.add_subparsers(dest="namespace")
     add_parser = subparsers.add_parser("add")
     stop_parser = subparsers.add_parser("stop")
-    for parser in (arg_parse, add_parser, stop_parser):
+    delete_parser = subparsers.add_parser("delete")
+    for parser in (arg_parse, add_parser, stop_parser, delete_parser):
         parser.add_argument(
             "-s",
             "--socket",
@@ -39,23 +40,16 @@ def parse_args() -> Namespace:
             default=SOCKET_NAME,
             help="Socket path to communicate with daemon",
         )
-    add_parser.add_argument(
-        "time",
-        type=str,
-        nargs="*",
-        help="List of times in format {hours}:{minutes} separated by spaces",
-    )
-    add_parser.add_argument(
-        "-d",
-        "--delete",
-        dest="delete",
-        action="store_true",
-        help="If you want to delete this alarms",
-    )
-    add_parser.add_argument(
-        "-w", "--when", default=When.auto, type=When, choices=list(When)
-    )
-    add_parser.set_defaults(delete=False)
+    for parser in (add_parser, delete_parser):
+        parser.add_argument(
+            "time",
+            type=str,
+            nargs="*",
+            help="List of times in format {hours}:{minutes} separated by spaces",
+        )
+        parser.add_argument(
+            "-w", "--when", default=When.auto, type=When, choices=list(When)
+        )
     return arg_parse.parse_args()
 
 
@@ -66,12 +60,13 @@ def main() -> None:
             send_message(args.socket, None, When.auto, RequestAction.list)
         elif args.namespace == "add":
             for time_str in args.time:
-                target_action = RequestAction.add
-                if args.delete:
-                    target_action = RequestAction.delete
-                send_message(args.socket, time_str, args.when, target_action)
+                send_message(args.socket, time_str, args.when, RequestAction.add)
+        elif args.namespace == "delete":
+            for time_str in args.time:
+                send_message(args.socket, time_str, args.when, RequestAction.delete)
         elif args.namespace == "stop":
             send_message(args.socket, None, When.auto, RequestAction.stop)
+
     except AlarmDaemonIsNotRunning:
         print("Are you sure that timer daemon is running.")
 
