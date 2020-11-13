@@ -6,7 +6,7 @@ from typing import Optional
 
 from alarmix.exceptions import AlarmDaemonIsNotRunning
 from alarmix.schema import RequestAction, TimeMessageClient, When
-from alarmix.utils import SOCKET_NAME
+from alarmix.utils import SOCKET_NAME, parse_relative_time
 
 
 def send_message(
@@ -60,6 +60,7 @@ def main() -> None:
             send_message(args.socket, None, When.auto, RequestAction.list)
         elif args.namespace == "add":
             for time_str in args.time:
+                time_str = parse_relative_time(time_str)
                 send_message(args.socket, time_str, args.when, RequestAction.add)
         elif args.namespace == "delete":
             for time_str in args.time:

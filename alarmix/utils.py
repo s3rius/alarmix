@@ -39,3 +39,18 @@ def remove_if_exists(filename: str) -> None:
     if os.path.exists(filename):
         logger.debug(f"removing {filename}")
         os.remove(filename)
+
+
+def parse_relative_time(relative_time_str: str) -> str:
+    if relative_time_str.startswith("+"):
+        now = datetime.now().replace(second=0, microsecond=0)
+        time_values = relative_time_str.lstrip("+").split(":")
+        if len(time_values) == 2:
+            hours, minutes = time_values
+            new_time = now + timedelta(hours=int(hours), minutes=int(minutes))
+        elif len(time_values) == 1:
+            new_time = now + timedelta(minutes=int(time_values[0]))
+        else:
+            return relative_time_str
+        return f"{new_time.hour}:{new_time.minute}"
+    return relative_time_str
