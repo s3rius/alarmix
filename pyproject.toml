@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "alarmix"
-version = "0.5.3"
+version = "0.5.4"
 description = "Alarm manager server and client"
 authors = ["Pavel Kirilin <win10@list.ru>"]
 repository = "https://github.com/s3rius/alarmix"
