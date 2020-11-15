@@ -1,3 +1,15 @@
+|py_versions| |build_statuses| |pypi_versions|
+
+.. |py_versions| image:: https://img.shields.io/pypi/pyversions/alarmix?style=flat-square
+    :alt: python versions
+
+.. |build_statuses| image:: https://img.shields.io/github/workflow/status/s3rius/alarmix/Release%20python%20package?style=flat-square
+    :alt: build status
+
+.. |pypi_versions| image:: https://img.shields.io/pypi/v/alarmix?style=flat-square
+    :alt: pypi version
+    :target: https://pypi.org/project/fastapi-template/
+
 .. image:: https://raw.githubusercontent.com/s3rius/alarmix/master/logo.png
     :alt: logo
     :align: center
