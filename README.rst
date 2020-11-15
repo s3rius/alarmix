@@ -8,7 +8,7 @@
 
 .. |pypi_versions| image:: https://img.shields.io/pypi/v/alarmix?style=flat-square
     :alt: pypi version
-    :target: https://pypi.org/project/fastapi-template/
+    :target: https://pypi.org/project/alarmix/
 
 .. image:: https://raw.githubusercontent.com/s3rius/alarmix/master/logo.png
     :alt: logo
