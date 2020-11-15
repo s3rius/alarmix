@@ -1,4 +1,4 @@
-.. image:: ./logo.png
+.. image:: https://raw.githubusercontent.com/s3rius/alarmix/master/logo.png
     :alt: logo
     :align: center
 
