@@ -31,7 +31,8 @@ class BuzzerThread(threading.Thread):
                 now = datetime.now().time().replace(second=0, microsecond=0)
                 if alarms[0].time == now:
                     lock.acquire()
-                    self.manager.alarm_pid = self.start_alarm()
+                    if self.manager.alarm_pid is None:
+                        self.manager.alarm_pid = self.start_alarm()
                     lock.release()
             sleep(20)
 
