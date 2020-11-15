@@ -22,7 +22,8 @@ Then you can manage your alarms with `alarmc` command.
 
 .. code-block:: bash
 
-    alarmc # Show scheduled alarms
+    alarmc # Show scheduled alarms for today
+    alarmc -f # Show all scheduled alarms
     alarmc stop # Stop buzzing alarm
     alarmc add 20:00 19:30 14:00 # Add alarms
     alarmc add +30 +2:40 # Add alarms with relative time

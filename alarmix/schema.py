@@ -1,8 +1,8 @@
 import enum
-from datetime import time
-from typing import Optional
+from datetime import time, timedelta
+from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class When(str, enum.Enum):
@@ -25,6 +25,7 @@ class RequestAction(str, enum.Enum):
 class TimeMessageBase(BaseModel):
     when: When
     action: RequestAction
+    full_list: bool = False
 
 
 class TimeMessageClient(TimeMessageBase):
@@ -36,6 +37,22 @@ class TimeMessageSocket(TimeMessageBase):
 
 
 class Alarm(BaseModel):
-    hours: int
-    minutes: int
-    when: When = Field(When.auto)
+    time: time
+    when: When
+
+    def __hash__(self) -> int:
+        return self.time.__hash__() + self.when.__hash__()
+
+
+class DeltaAlarm(Alarm):
+    delta: timedelta
+
+
+class AlarmInfo(BaseModel):
+    time: time
+    remaining: str
+    when: str  # Possible values are `When` or date if When == auto
+
+
+class InfoList(BaseModel):
+    alarms: List[AlarmInfo]
