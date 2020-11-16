@@ -111,9 +111,6 @@ class AlarmManager:
     def is_canceled(self, event_time: time, when: When) -> bool:
         today = date.today()
         for alarm in self.canceled[when.value]:
-            if alarm.canceled < today:
-                self.canceled[when.value].remove(alarm)
-                continue
             if alarm.time == event_time and alarm.canceled == today:
                 return True
         return False
@@ -158,6 +155,11 @@ class AlarmManager:
         self.alarms[When.auto.value] = {
             alarm for alarm in auto_alarms if alarm >= now  # type: ignore
         }
+        today = date.today()
+        for key in self.canceled.keys():
+            self.canceled[key] = set(
+                [alarm for alarm in self.canceled[key] if alarm.canceled >= today]
+            )
 
     def dump_alarms(self) -> None:
         with open(self.dump_file, "wb") as file:
