@@ -2,7 +2,7 @@ import json
 import os.path
 import socket
 from argparse import ArgumentParser, Namespace
-from typing import Optional
+from typing import List, Optional
 
 from prettytable import PrettyTable
 
@@ -38,12 +38,14 @@ def print_alarms(socket_addr: str, full_list: bool) -> str:
     alarms_list_str = send_message(
         socket_addr=socket_addr, action=RequestAction.list, full_list=full_list
     )
-    table = PrettyTable(field_names=["alarm time", "remaining time", "when"])
+    table = PrettyTable(
+        field_names=["alarm time", "remaining time", "when", "canceled"]
+    )
     alarms_list = InfoList(**json.loads(alarms_list_str))
     if len(alarms_list.alarms) == 0:
         return "No alarms found"
     for alarm in alarms_list.alarms:
-        table.add_row([str(alarm.time), alarm.remaining, alarm.when])
+        table.add_row([str(alarm.time), alarm.remaining, alarm.when, alarm.canceled])
     return table.get_string()
 
 
@@ -53,6 +55,7 @@ def parse_args() -> Namespace:
     add_parser = subparsers.add_parser("add")
     stop_parser = subparsers.add_parser("stop")
     delete_parser = subparsers.add_parser("delete")
+    cancel_parser = subparsers.add_parser("cancel")
     arg_parse.add_argument(
         "-f",
         "--full",
@@ -61,7 +64,7 @@ def parse_args() -> Namespace:
         action="store_true",
         help="Print information about all existing alarms",
     )
-    for parser in (arg_parse, add_parser, stop_parser, delete_parser):
+    for parser in (arg_parse, add_parser, stop_parser, delete_parser, cancel_parser):
         parser.add_argument(
             "-s",
             "--socket",
@@ -69,7 +72,7 @@ def parse_args() -> Namespace:
             default=SOCKET_NAME,
             help="Socket path to communicate with daemon",
         )
-    for parser in (add_parser, delete_parser):
+    for parser in (add_parser, delete_parser, cancel_parser):
         parser.add_argument(
             "time",
             type=str,
@@ -82,6 +85,25 @@ def parse_args() -> Namespace:
     return arg_parse.parse_args()
 
 
+def loop_time_action(
+    socket_addr: str,
+    action: RequestAction,
+    time_list: List[str],
+    when: When,
+    allow_relative: bool = False,
+) -> None:
+    for time_str in time_list:
+        if allow_relative:
+            time_str = parse_relative_time(time_str)
+        answer = send_message(
+            socket_addr=socket_addr,
+            action=action,
+            time_str=time_str,
+            when=when,
+        )
+        print(answer)
+
+
 def main() -> None:
     args = parse_args()
     try:
@@ -89,22 +111,27 @@ def main() -> None:
         if args.namespace is None:
             answer = print_alarms(socket_addr=args.socket, full_list=args.full)
         elif args.namespace == "add":
-            for time_str in args.time:
-                time_str = parse_relative_time(time_str)
-                answer = send_message(
-                    socket_addr=args.socket,
-                    action=RequestAction.add,
-                    time_str=time_str,
-                    when=args.when,
-                )
+            loop_time_action(
+                socket_addr=args.socket,
+                action=RequestAction.add,
+                time_list=args.time,
+                when=args.when,
+                allow_relative=True,
+            )
+        elif args.namespace == "cancel":
+            loop_time_action(
+                socket_addr=args.socket,
+                action=RequestAction.cancel,
+                time_list=args.time,
+                when=args.when,
+            )
         elif args.namespace == "delete":
-            for time_str in args.time:
-                answer = send_message(
-                    socket_addr=args.socket,
-                    action=RequestAction.delete,
-                    time_str=time_str,
-                    when=args.when,
-                )
+            loop_time_action(
+                socket_addr=args.socket,
+                action=RequestAction.delete,
+                time_list=args.time,
+                when=args.when,
+            )
         elif args.namespace == "stop":
             answer = send_message(socket_addr=args.socket, action=RequestAction.stop)
         print(answer)

@@ -11,6 +11,7 @@ from loguru import logger
 from alarmix.schema import (
     Alarm,
     AlarmInfo,
+    CanceledAlarm,
     DeltaAlarm,
     InfoList,
     RequestAction,
@@ -29,6 +30,7 @@ class AlarmManager:
         self.dump_file = dump_file
         self.alarm_pid: Optional[int] = None
         self.alarms: DefaultDict[str, Set[Union[time, datetime]]] = defaultdict(set)
+        self.canceled: DefaultDict[str, Set[CanceledAlarm]] = defaultdict(set)
 
     def process_message(self, msg: TimeMessageSocket) -> str:
         """
@@ -44,6 +46,10 @@ class AlarmManager:
             self.add_alarm(msg.time, msg.when)
             self.dump_alarms()
             message = "Successfully added"
+        elif msg.action == RequestAction.cancel:
+            self.cancel_alarm(msg.time)
+            self.dump_alarms()
+            message = "Alarm cancelled"
         elif msg.action == RequestAction.list:
             message = self.list_formatted(msg.full_list).json()
         elif msg.action == RequestAction.stop:
@@ -68,6 +74,7 @@ class AlarmManager:
                     time=alarm.time,
                     remaining=str(alarm.delta).split(".")[0],
                     when=when_str,
+                    canceled=self.is_canceled(alarm.time, when=alarm.when),
                 )
             )
         return InfoList(alarms=info_list)
@@ -88,6 +95,28 @@ class AlarmManager:
         if when == When.auto:
             target = calculate_auto_time(event_time)
         self.alarms[when.value].discard(target)
+
+    def cancel_alarm(self, event_time: time) -> None:
+        """
+        Cancel alarm for today
+        """
+        alarms = self.list_alarms()
+        for alarm in alarms:
+            if alarm.time == event_time:
+                if alarm.when == When.auto:
+                    self.del_alarm(event_time, When.auto)
+                else:
+                    self.canceled[alarm.when.value].add(CanceledAlarm(time=event_time))
+
+    def is_canceled(self, event_time: time, when: When) -> bool:
+        today = date.today()
+        for alarm in self.canceled[when.value]:
+            if alarm.canceled < today:
+                self.canceled[when.value].remove(alarm)
+                continue
+            if alarm.time == event_time and alarm.canceled == today:
+                return True
+        return False
 
     def list_alarms(self, all_alarms: bool = False) -> List[DeltaAlarm]:
         """
@@ -132,10 +161,13 @@ class AlarmManager:
 
     def dump_alarms(self) -> None:
         with open(self.dump_file, "wb") as file:
-            pickle.dump(self.alarms, file)
+            pickle.dump(self, file)
 
     def load_alarms(self) -> None:
         if not os.path.exists(self.dump_file):
             return None
         with open(self.dump_file, "rb") as file:
-            self.alarms = pickle.load(file)
+            old_manager: AlarmManager = pickle.load(file)
+            self.alarms = old_manager.alarms
+            self.canceled = old_manager.canceled
+            logger.debug("Alarms loaded")

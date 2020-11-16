@@ -1,8 +1,8 @@
 import enum
-from datetime import time, timedelta
+from datetime import date, time, timedelta
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class When(str, enum.Enum):
@@ -17,9 +17,10 @@ class When(str, enum.Enum):
 
 class RequestAction(str, enum.Enum):
     add = "add"
-    delete = "delete"
     list = "list"
     stop = "stop"
+    delete = "delete"
+    cancel = "cancel"
 
 
 class TimeMessageBase(BaseModel):
@@ -52,7 +53,16 @@ class AlarmInfo(BaseModel):
     time: time
     remaining: str
     when: str  # Possible values are `When` or date if When == auto
+    canceled: bool
 
 
 class InfoList(BaseModel):
     alarms: List[AlarmInfo]
+
+
+class CanceledAlarm(BaseModel):
+    time: time
+    canceled: date = Field(default_factory=date.today)
+
+    def __hash__(self) -> int:
+        return self.time.__hash__() + self.canceled.__hash__()
