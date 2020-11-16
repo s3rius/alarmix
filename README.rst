@@ -28,7 +28,14 @@ At first, you need to start alarmd daemon:
 
 .. code-block:: bash
 
-    alarmd --sound "path/to/sound"
+    # Run alarmd-server as a daemon
+    alarmd -s "path/to/sound/to/play" -d
+
+    # To kill it you need to run
+    alarmd kill
+
+    # Of course you can see help
+    alarmd -h
 
 Then you can manage your alarms with `alarmc` command.
 
@@ -43,3 +50,38 @@ Then you can manage your alarms with `alarmc` command.
     alarmc
 
     alarmc -h # Show help
+
+Also alarmc can display information about your schedule in different formats:
+
+.. code-block::
+
+    ➜  ~ alarmc # Default schedule information
+    +------------+----------------+
+    | alarm time | remaining time |
+    +------------+----------------+
+    |  09:30:00  |    9:01:28     |
+    +------------+----------------+
+
+    ➜  ~ alarmc -r # Raw data without table formatting (separated by '\t' character)
+    alarm time      remaining time
+    09:30:00        9:00:43
+
+    ➜  ~ alarmc -w # Show "When" column
+    +------------+----------------+----------+
+    | alarm time | remaining time |   when   |
+    +------------+----------------+----------+
+    |  09:30:00  |    8:58:58     | weekdays |
+    +------------+----------------+----------+
+
+    ➜  ~ alarmc -c # Show "Cancelled" column
+    +------------+----------------+-----------+
+    | alarm time | remaining time | cancelled |
+    +------------+----------------+-----------+
+    |  09:30:00  |    8:57:35     |   False   |
+    +------------+----------------+-----------+
+
+    # All options can be combined
+    ➜  ~ alarmc -rwc
+    alarm time      remaining time  when            cancelled
+    09:30:00        8:58:15         weekdays        False
+

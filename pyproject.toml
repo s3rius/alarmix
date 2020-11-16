@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "alarmix"
-version = "0.7.7"
+version = "0.8.7"
 description = "Alarm manager server and client"
 authors = ["Pavel Kirilin <win10@list.ru>"]
 repository = "https://github.com/s3rius/alarmix"
@@ -27,6 +27,7 @@ python = "^3.8"
 pydantic = "^1.7.2"
 loguru = "^0.5.3"
 prettytable = "^2.0.0"
+daemonize = "^2.5.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.8.2"
