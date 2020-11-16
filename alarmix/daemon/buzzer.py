@@ -33,7 +33,7 @@ class BuzzerThread(threading.Thread):
                 if alarm.time == now:
                     lock.acquire()
                     if (
-                        self.manager.is_canceled(alarm.time, alarm.when)
+                        not self.manager.is_canceled(alarm.time, alarm.when)
                         and self.manager.alarm_pid is None
                     ):
                         self.manager.alarm_pid = self.start_alarm()
