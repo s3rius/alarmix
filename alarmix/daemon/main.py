@@ -1,9 +1,8 @@
 import os
 import signal
 from argparse import ArgumentParser, Namespace
-from collections import Callable
 from pathlib import Path
-from typing import List
+from typing import Callable, List
 
 from daemonize import Daemonize
 from loguru import logger
