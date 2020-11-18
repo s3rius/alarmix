@@ -17,6 +17,7 @@ class BuzzerThread(threading.Thread):
         threading.Thread.__init__(self)
         self.manager = manager
         self.sound = args.sound
+        self.last_played_time = None
         if not os.path.exists(self.sound):
             raise SoundFileNotFound(self.sound)
 
@@ -35,8 +36,10 @@ class BuzzerThread(threading.Thread):
                     if (
                         not self.manager.is_canceled(alarm.time, alarm.when)
                         and self.manager.alarm_pid is None
+                        and now != self.last_played_time
                     ):
                         self.manager.alarm_pid = self.start_alarm()
+                        self.last_played_time = alarm.time
                     lock.release()
             sleep(10)
 
