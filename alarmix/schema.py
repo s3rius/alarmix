@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
+@enum.unique
 class When(str, enum.Enum):
     auto = "auto"
     everyday = "everyday"
@@ -15,6 +16,7 @@ class When(str, enum.Enum):
         return str(self.value)
 
 
+@enum.unique
 class RequestAction(str, enum.Enum):
     add = "add"
     list = "list"
