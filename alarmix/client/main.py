@@ -59,8 +59,6 @@ def print_alarms(
         socket_addr=socket_addr, action=RequestAction.list, full_list=full_list
     )
     alarms_list = InfoList(**json.loads(alarms_list_str))
-    if len(alarms_list.alarms) == 0:
-        return "No alarms found"
 
     table_fields = ["alarm time", "remaining time"]
     if list_whens:
@@ -77,6 +75,9 @@ def print_alarms(
         if show_cancelled:
             row.append(alarm.canceled)
         raw_rows.append(row)
+
+    if len(raw_rows) == 0:
+        return "No alarms found"
 
     if raw_table:
         return render_raw(table_fields, raw_rows)
