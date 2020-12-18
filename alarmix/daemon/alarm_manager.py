@@ -157,9 +157,9 @@ class AlarmManager:
         }
         today = date.today()
         for key in self.canceled.keys():
-            self.canceled[key] = set(
-                [alarm for alarm in self.canceled[key] if alarm.canceled >= today]
-            )
+            self.canceled[key] = {
+                alarm for alarm in self.canceled[key] if alarm.canceled >= today
+            }
 
     def dump_alarms(self) -> None:
         with open(self.dump_file, "wb") as file:
