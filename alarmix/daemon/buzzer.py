@@ -17,6 +17,7 @@ class BuzzerThread(threading.Thread):
         threading.Thread.__init__(self)
         self.manager = manager
         self.sound = args.sound
+        self.last_played_time = None
         if not os.path.exists(self.sound):
             raise SoundFileNotFound(self.sound)
 
@@ -29,14 +30,23 @@ class BuzzerThread(threading.Thread):
             lock.release()
             if len(alarms) > 0:
                 now = datetime.now().time().replace(second=0, microsecond=0)
-                if alarms[0].time == now:
+                alarm = alarms[0]
+                if alarm.time == now:
                     lock.acquire()
-                    self.manager.alarm_pid = self.start_alarm()
+                    if (
+                        not self.manager.is_canceled(alarm.time, alarm.when)
+                        and self.manager.alarm_pid is None
+                        and now != self.last_played_time
+                    ):
+                        self.manager.alarm_pid = self.start_alarm()
+                        self.last_played_time = alarm.time
                     lock.release()
-            sleep(20)
+            sleep(10)
 
     def start_alarm(self) -> int:
-        process = subprocess.Popen(["mpv", "--loop", "--no-video", self.sound])
+        process = subprocess.Popen(
+            ["mpv", "--really-quiet", "--loop", "--no-video", self.sound]
+        )
         return process.pid
 
     def finalize(self) -> None:
